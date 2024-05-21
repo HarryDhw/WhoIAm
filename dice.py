@@ -40,4 +40,5 @@ mydice = Dice()
 
 
 if __name__ == '__main__':
-    mydice.showdata(1000)
+    mydice.makegames(10)
+    print(mydice.sample)
