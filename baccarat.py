@@ -56,18 +56,33 @@ class Baccarat:
             if pn >= 6:
                 bn, banker = self.bankerAddCard(bn, banker, removed)
                 self.judge(pn, bn, player, banker)
+            elif bn == 7:
+                pn, player = self.playerAddCard(pn, player, removed)
+                self.judge(pn, bn, player, banker)
+            elif bn <= 2:
+                pn, player = self.playerAddCard(pn, player, removed)
+                bn, banker = self.bankerAddCard(bn, banker, removed)
+                self.judge(pn, bn, player, banker)
+            else:
+                pn, player = self.playerAddCard(pn, player, removed)
+                x = self.addnum(player['cards'][-1])
+                if (bn == 3 and x == 8) or (bn == 4 and x in (0, 1, 8, 9)) \
+                    or (bn == 5 and x in (0, 1, 2, 3, 8, 9)) or (bn == 6 and x not in (6, 7)):
+                    self.judge(pn, bn, player, banker)
+                else:
+                    bn, banker = self.bankerAddCard(bn, banker, removed)
+                    self.judge(pn, bn, player, banker)
 
         self.usedcards.extend(removed)
         self.record.append((player, banker))
-        print(player, banker, sep='\n')
-        print('Removed:%s, Rest:%s' % (len(removed), len(self.cards)))
-        print(self.results)
-        print(self.record)
+        # print(player, banker, sep='\n')
+        # print('Removed:%s, Rest:%s' % (len(removed), len(self.cards)))
+        # print(self.results)
+        # print(self.record)
 
     def addnum(self, card):
         try:
-            n = card[0] / 1
-            return n
+            return int(card[0])
         except:
             return 0
         
@@ -80,6 +95,8 @@ class Baccarat:
         elif pn < bn:
             self.results.append('B')
             banker['win'] = True
+            if bn == 6:
+                banker['issixwin'] = True
         else:
             self.results.append('T')
 
@@ -105,4 +122,16 @@ if __name__ == '__main__':
     game = Baccarat()
     game.makecards()
     game.ready()
-    game.play()
+    x = 0
+    while len(game.cards) > 20:
+        game.play()
+        x += 1
+    p, b, t = game.results.count('P'), game.results.count('B'), game.results.count('T')
+    print('Games Total:%s - %s - %s' % (x, len(game.results), len(game.record)))
+    print('UsedCards:%s,  RestCards:%s' % (len(game.usedcards), len(game.cards)))
+    print('Player:%s, Banker:%s, Tie:%s' % (p, b, t))
+    print('Player:%.2f, Banker:%.2f, Tie:%.2f' % (p / x, b / x, t / x))
+    sample = random.randint(0, 50)
+    print('Samples:%s' % sample)
+    print(game.results[sample])
+    print(game.record[sample])
